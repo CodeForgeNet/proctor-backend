@@ -19,26 +19,6 @@ app.use(morgan("dev"));
 app.use(cors({ origin: process.env.CORS_ORIGIN || "http://localhost:3000" }));
 app.use(express.json());
 
-app.use((req, res, next) => {
-  console.log(`Incoming Request: ${req.method} ${req.url}`);
-  console.log(`Content-Type: ${req.headers["content-type"]}`);
-
-  if (req.method === "POST" || req.method === "PUT") {
-    let data = "";
-    req.on("data", (chunk) => {
-      data += chunk;
-    });
-    req.on("end", () => {
-      console.log("Raw Body:", data);
-
-      (req as any).rawBody = data;
-      next();
-    });
-  } else {
-    next();
-  }
-});
-
 const uploadsDir = process.env.VIDEO_STORAGE_PATH || "./uploads";
 app.use("/uploads", express.static(path.join(__dirname, "..", uploadsDir)));
 
