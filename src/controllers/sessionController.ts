@@ -22,7 +22,7 @@ export const createSession = async (
 
     await session.save();
 
-    res.status(201).send(session._id.toString());
+    res.status(201).json(session);
   } catch (error) {
     console.error("Error creating session:", error);
     res.status(500).json({ error: "Failed to create session" });
