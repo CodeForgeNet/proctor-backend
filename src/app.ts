@@ -45,14 +45,6 @@ app.use("/reports", express.static(path.join(__dirname, "../reports")));
 
 app.use("/api", apiRoutes);
 
-// Serve static assets from the frontend build directory
-app.use(express.static(path.join(__dirname, '../../frontend/build')));
-
-// For any other request, serve the frontend's index.html
-app.use((req, res) => {
-  res.sendFile(path.resolve(__dirname, '../../frontend/build', 'index.html'));
-});
-
 app.use((req, res, next) => {
   res.status(404).json({ error: "Not Found" });
 });
