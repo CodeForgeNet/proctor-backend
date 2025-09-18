@@ -49,7 +49,7 @@ app.use("/api", apiRoutes);
 app.use(express.static(path.join(__dirname, '../../frontend/build')));
 
 // For any other request, serve the frontend's index.html
-app.get('*', (req, res) => {
+app.get('/*', (req, res) => {
   res.sendFile(path.resolve(__dirname, '../../frontend/build', 'index.html'));
 });
 
