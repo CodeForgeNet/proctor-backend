@@ -16,7 +16,7 @@ const app = express();
 
 app.use(morgan("dev"));
 
-app.use(cors({ origin: process.env.CORS_ORIGIN || "http://localhost:3000" }));
+app.use(cors({ origin: "http://localhost:3000" }));
 
 app.use((req, res, next) => {
   console.log(`Incoming Request: ${req.method} ${req.url}`);
@@ -46,11 +46,11 @@ app.use("/reports", express.static(path.join(__dirname, "../reports")));
 app.use("/api", apiRoutes);
 
 // Serve static assets from the frontend build directory
-app.use(express.static(path.join(__dirname, '../../frontend/build')));
+app.use(express.static(path.join(__dirname, "../../frontend/build")));
 
 // For any other request, serve the frontend's index.html
-app.get('/*', (req, res) => {
-  res.sendFile(path.resolve(__dirname, '../../frontend/build', 'index.html'));
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "../../frontend/build", "index.html"));
 });
 
 app.use((req, res, next) => {
