@@ -10,9 +10,13 @@ export interface IEvent {
 export interface ISession extends Document {
   _id: Types.ObjectId;
   candidateName: string;
+  interviewerId: string;
+  candidateEmail: string; // Renamed from interviewerEmail
+  candidateId?: string; // New optional field
   startTime: Date;
   endTime?: Date;
   videoUrl?: string;
+  reportUrl?: string;
   events: IEvent[];
   integrityScore?: number;
 }
@@ -45,12 +49,25 @@ const SessionSchema = new Schema<ISession>(
       type: String,
       required: true,
     },
+    interviewerId: {
+      type: String,
+      required: true,
+    },
+    candidateEmail: { // Renamed from interviewerEmail
+      type: String,
+      required: false,
+    },
+    candidateId: { // New optional field
+      type: String,
+      required: false, // Candidate ID is set after candidate claims the session
+    },
     startTime: {
       type: Date,
       default: Date.now,
     },
     endTime: Date,
     videoUrl: String,
+    reportUrl: String,
     events: [EventSchema],
     integrityScore: Number,
   },
@@ -59,7 +76,7 @@ const SessionSchema = new Schema<ISession>(
     toJSON: {
       virtuals: true,
       transform: (doc, ret) => {
-        delete (ret as any)._id;
+        ret.id = ret._id; // Map _id to id
         delete (ret as any).__v;
         return ret;
       },

@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import apiRoutes from "./routes/api.js";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
+import "./config/firebaseAdmin.js"; // Initialize Firebase Admin SDK
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -42,4 +43,13 @@ app.use(
   }
 );
 
+// Export the app for serverless environments
 export default app;
+
+// Only start the server if not in a serverless environment
+if (process.env.NODE_ENV !== 'production' && process.env.IS_OFFLINE !== 'true' && process.env.AWS_LAMBDA_FUNCTION_NAME === undefined) {
+  const PORT = process.env.PORT || 5001;
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}

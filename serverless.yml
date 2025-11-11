@@ -1,0 +1,50 @@
+service: proctor-project-backend # Your service name
+
+provider:
+  name: aws
+  runtime: nodejs18.x # Or nodejs20.x
+  region: us-east-1 # Your desired AWS region
+  stage: dev # Deployment stage (e.g., dev, prod)
+  memorySize: 1024 # Optional: Increase memory for better performance
+  timeout: 30 # Optional: Increase timeout for longer-running requests
+  environment:
+    # Pass your environment variables here
+    # These should match your .env file or be configured in AWS Secrets Manager
+    MONGO_URI: ${env:MONGO_URI}
+    JWT_SECRET: ${env:JWT_SECRET}
+    CLOUDINARY_CLOUD_NAME: ${env:CLOUDINARY_CLOUD_NAME}
+    CLOUDINARY_API_KEY: ${env:CLOUDINARY_API_KEY}
+    CLOUDINARY_API_SECRET: ${env:CLOUDINARY_API_SECRET}
+    FIREBASE_PROJECT_ID: ${env:FIREBASE_PROJECT_ID}
+    FIREBASE_CLIENT_EMAIL: ${env:FIREBASE_CLIENT_EMAIL}
+    FIREBASE_PRIVATE_KEY: ${env:FIREBASE_PRIVATE_KEY}
+    CORS_ORIGIN: ${env:CORS_ORIGIN}
+    # Add any other environment variables your backend needs
+    # Example:
+    # DB_HOST: ${env:DB_HOST}
+
+functions:
+  api:
+    handler: lambda.handler # The file (lambda.ts) and the exported function (handler)
+    events:
+      - http:
+          path: /{proxy+} # Catch all requests
+          method: any
+          cors: true # Enable CORS for your API Gateway endpoint
+
+plugins:
+  - serverless-esbuild # For bundling TypeScript
+  - serverless-offline # For local testing
+
+custom:
+  esbuild:
+    bundle: true
+    minify: true
+    sourcemap: true
+    external: # List any modules that should NOT be bundled (e.g., native modules)
+      - mongodb-client-encryption
+      - aws-sdk
+    platform: node
+    target: node18 # Or node20
+  serverless-offline:
+    httpPort: 5001 # Match your local backend port
