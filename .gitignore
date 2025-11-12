@@ -12,3 +12,5 @@ npm-debug.log*
 
 # Coverage
 /coverage
+
+my-firebase-key.json

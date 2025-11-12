@@ -3,7 +3,7 @@ service: proctor-project-backend # Your service name
 provider:
   name: aws
   runtime: nodejs18.x # Or nodejs20.x
-  region: us-east-1 # Your desired AWS region
+  region: ap-south-1 # Your desired AWS region
   stage: dev # Deployment stage (e.g., dev, prod)
   memorySize: 1024 # Optional: Increase memory for better performance
   timeout: 30 # Optional: Increase timeout for longer-running requests
@@ -33,7 +33,6 @@ functions:
           cors: true # Enable CORS for your API Gateway endpoint
 
 plugins:
-  - serverless-esbuild # For bundling TypeScript
   - serverless-offline # For local testing
 
 custom:

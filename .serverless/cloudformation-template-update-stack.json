@@ -1,0 +1,348 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "The AWS CloudFormation template for this Serverless application",
+  "Resources": {
+    "ApiLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/proctor-project-backend-dev-api"
+      }
+    },
+    "IamRoleLambdaExecution": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": {
+              "Fn::Join": [
+                "-",
+                [
+                  "proctor-project-backend",
+                  "dev",
+                  "lambda"
+                ]
+              ]
+            },
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogStream",
+                    "logs:CreateLogGroup",
+                    "logs:TagResource"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/proctor-project-backend-dev*:*"
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/proctor-project-backend-dev*:*:*"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ],
+        "Path": "/",
+        "RoleName": {
+          "Fn::Join": [
+            "-",
+            [
+              "proctor-project-backend",
+              "dev",
+              {
+                "Ref": "AWS::Region"
+              },
+              "lambdaRole"
+            ]
+          ]
+        }
+      }
+    },
+    "ApiLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "serverless-framework-deployments-ap-south-1-104543f6-7507",
+          "S3Key": "serverless/proctor-project-backend/dev/1762921255006-2025-11-12T04:20:55.006Z/proctor-project-backend.zip"
+        },
+        "Handler": "lambda.handler",
+        "Runtime": "nodejs18.x",
+        "FunctionName": "proctor-project-backend-dev-api",
+        "MemorySize": 1024,
+        "Timeout": 30,
+        "Environment": {
+          "Variables": {
+            "MONGO_URI": "mongodb+srv://proctorUser:S5yoveSJZJdeST2T@proctordb.9dyyeok.mongodb.net/",
+            "JWT_SECRET": "b519fef08b338d222a5f80480b0624387a6d2380070b22bed43f081b3e98383b",
+            "CLOUDINARY_CLOUD_NAME": "duyrazya5",
+            "CLOUDINARY_API_KEY": "882386371248612",
+            "CLOUDINARY_API_SECRET": "d64uxmLgCz_2skqZcIx6qRSqqTc",
+            "FIREBASE_PROJECT_ID": "revisely-85ea4",
+            "FIREBASE_CLIENT_EMAIL": "firebase-adminsdk-fbsvc@revisely-85ea4.iam.gserviceaccount.com",
+            "FIREBASE_PRIVATE_KEY": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCQdokD9f5xB3zu\nVSGDjhgVEGTZRByetQUmsBUqTKhxsU95E7yGZWh1z8tT9/pAKuX9BIzEj9u9VlSO\n+qtDhtbA8twl/inxUAsAyZVLP6NrgNrq2P/oGTJCB2L25p3w+jt3/eTTHEDLrNE4\nSCJ6ckzEFR4OS+3svXtHgG7XHrBwz6Kyt84sQ3tpNcpWS+gT6l85P8hicDYoQzXF\nH/QD6bLFJEWGKEGxZfHhyQh4MnPp3ZoFFu0978EwnGmivvZKbpEoED5YADSh0EH5\nfPNlBe2e3eCgR1xE5hrXgDYDL2Yh814oBAVPAOI0uZJ4S/kOwPrs+jrawcyztsOq\nVAWfuHpLAgMBAAECggEACOm/V2a4jam8HApVmIPOWZJa3orUxzf8+t+XVrZHGEir\n0hkVIyejk80/ysz8fDQJX5yFwOTtVle6vN2bbn2lx17UlWWCmfhpzWEinHNvNkVL\nfHzqARx43NkO0pP0/7a4r5UTJrFSEB74A6RzuCFQOjLhWVl28wnXztgOPqiOk08s\niL6vS7i32oQpWKmPjxhepENalMmZzgP5kxwQ8qbKmOQ6GOC1xaRLo3HlhYHMXHjW\n06ANXUO8aJQ0VhqR6T7xNH3Oetti2HsQGedzTQ0ml3PWjH8WNmp1zCKrLLg26ifu\nVRuJsF4hEVMXraAR3xZHCdq7LAPW1wRaHA6LoaMywQKBgQDG18Ukc9DI0ftg9hyT\nBAfQqVOIf5ACCqSkQ9Fc5vf83TXui+ix+kAKUUUcuxsmdfTuuqRQAE2lzVGHMPZQ\nbIIOADI6PWqwwkZXfrByFD3yfaNxvXJ/Mdp+jVemPXGKzqUd7duMgPNrT/pIlsiF\nqikUxJnCOKpYfM4aPz48jdMBiwKBgQC5/R9LhNkpmfs0LG8CdlvxEQPoAD2lPveD\n62BgjnJP5kvJyUn/kIYWr0hQseVz/gq2NtxIIUuEfyR1uBjc1TpTQ8lxDXSUkG/T\nkCGtgcFzakMzoxF4mVFt+KWlPfonBcJFGYd70XOG0b5e0r8G7jECi2kckAwRLDqM\nFEZ1xaYCQQKBgQDAInJOHNLbmXsLYASQUk6y40riFFC0iFA6oYVF/bAWWDHqxKoe\nf68tyQW9E1bSvRvlKdfnrcNZuKFUvozjfVXV7X6bJAlZrv+FP9eDA+gvzhMGroZa\nPXPg4PaWnbx+4dpOpy2EAH41bVxsk7ZC4f88IBRqxZJkWoRUfFPI80m2rQKBgDvF\ns3cLvNb325mK5io+a5Hvy/eVjDo9IELPNGwTm30+IAE7pYJyqgVEU9NLONisPjkN\nLIIp4SE10zvZ7HOcO2BjGqwwjNTqDmZJnekrGEbFUc+YipbdfyP+kw2l+2zrFuIq\nMDaEu8IKSkojJK1Pg4Sz1RYO3THvquk14ucanB2BAoGAYj1mkRssZe9G+Ufj4a0h\nIFAIZKUNTpjaXEbFC22RVuwY9v/cn7p3nprj+5MOXPyXdlQ3i+VFQabN5WSE5LoT\noKU+IkF3Ny7QGtZrwlWE91svdeu7mFvfmF5wVeiT+Gc3FO5cpS4UbnZSHHs1lHsj\ny3nOHxiS5v4uv57CK3S5juI=\n-----END PRIVATE KEY-----\n",
+            "CORS_ORIGIN": "http://localhost:3000",
+            "NODE_OPTIONS": "--enable-source-maps"
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "ApiLogGroup"
+      ]
+    },
+    "ApiLambdaVersionmNgwRu9LBS9kCPyok9vpt2BoBwQgsDlwU84ZfaMSw": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "ApiLambdaFunction"
+        },
+        "CodeSha256": "sHxKpovczUpyPoLmhMviHpcD3nnhBfwowplqRr3bmVI="
+      }
+    },
+    "ApiGatewayRestApi": {
+      "Type": "AWS::ApiGateway::RestApi",
+      "Properties": {
+        "Name": "dev-proctor-project-backend",
+        "EndpointConfiguration": {
+          "Types": [
+            "EDGE"
+          ]
+        },
+        "Policy": ""
+      }
+    },
+    "ApiGatewayResourceProxyVar": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Fn::GetAtt": [
+            "ApiGatewayRestApi",
+            "RootResourceId"
+          ]
+        },
+        "PathPart": "{proxy+}",
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayMethodProxyVarOptions": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "AuthorizationType": "NONE",
+        "HttpMethod": "OPTIONS",
+        "MethodResponses": [
+          {
+            "StatusCode": "200",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true,
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true
+            },
+            "ResponseModels": {}
+          }
+        ],
+        "RequestParameters": {},
+        "Integration": {
+          "Type": "MOCK",
+          "RequestTemplates": {
+            "application/json": "{statusCode:200}"
+          },
+          "ContentHandling": "CONVERT_TO_TEXT",
+          "IntegrationResponses": [
+            {
+              "StatusCode": "200",
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'",
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent,X-Amzn-Trace-Id'",
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,DELETE,GET,HEAD,PATCH,POST,PUT'"
+              },
+              "ResponseTemplates": {
+                "application/json": ""
+              }
+            }
+          ]
+        },
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceProxyVar"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayMethodProxyVarAny": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "HttpMethod": "ANY",
+        "RequestParameters": {},
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceProxyVar"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        },
+        "ApiKeyRequired": false,
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "ApiLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "/invocations"
+              ]
+            ]
+          }
+        },
+        "MethodResponses": []
+      },
+      "DependsOn": [
+        "ApiLambdaPermissionApiGateway"
+      ]
+    },
+    "ApiGatewayDeployment1762921246418": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        },
+        "StageName": "dev"
+      },
+      "DependsOn": [
+        "ApiGatewayMethodProxyVarOptions",
+        "ApiGatewayMethodProxyVarAny"
+      ]
+    },
+    "ApiLambdaPermissionApiGateway": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "ApiLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "/*/*"
+            ]
+          ]
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "ServerlessDeploymentBucketName": {
+      "Value": "serverless-framework-deployments-ap-south-1-104543f6-7507",
+      "Export": {
+        "Name": "sls-proctor-project-backend-dev-ServerlessDeploymentBucketName"
+      }
+    },
+    "ApiLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "ApiLambdaVersionmNgwRu9LBS9kCPyok9vpt2BoBwQgsDlwU84ZfaMSw"
+      },
+      "Export": {
+        "Name": "sls-proctor-project-backend-dev-ApiLambdaFunctionQualifiedArn"
+      }
+    },
+    "ServiceEndpoint": {
+      "Description": "URL of the service endpoint",
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "https://",
+            {
+              "Ref": "ApiGatewayRestApi"
+            },
+            ".execute-api.",
+            {
+              "Ref": "AWS::Region"
+            },
+            ".",
+            {
+              "Ref": "AWS::URLSuffix"
+            },
+            "/dev"
+          ]
+        ]
+      },
+      "Export": {
+        "Name": "sls-proctor-project-backend-dev-ServiceEndpoint"
+      }
+    }
+  }
+}
